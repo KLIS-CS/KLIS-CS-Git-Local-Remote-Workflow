@@ -1,0 +1,37 @@
+name: "Submit CP4"
+description: "Submit your public CP4 practice repository for automatic and teacher grading."
+title: "[CP4] Local ↔ Remote Submission"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Submit the **repository URL** for your completed CP4 copy. Keep the copied repository Public so the KLIS-CS mother grader can read the trusted CP4 automatic grader output.
+
+  - type: input
+    id: repo
+    attributes:
+      label: Practice Repository URL
+      description: Paste the repository URL. Nested GitHub URLs such as /tree/main are accepted.
+      placeholder: https://github.com/YOUR-USERNAME/cp4-local-remote-workflow
+    validations:
+      required: true
+
+  - type: input
+    id: username
+    attributes:
+      label: GitHub Username
+      placeholder: YOUR-GITHUB-USERNAME
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: integrity
+    attributes:
+      label: Integrity Check
+      options:
+        - label: I used the official KLIS-CS CP4 Copy Exercise.
+          required: true
+        - label: My CP4 branch and open Pull Request are visible in this repository.
+          required: true
+        - label: I did not include passwords, API keys, tokens, or other secrets.
+          required: true
