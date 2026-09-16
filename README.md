@@ -6,21 +6,19 @@ Show that you understand how a local Git repository connects to a GitHub remote 
 
 ## Start the exercise
 
-Copy this checkpoint into your own GitHub account:
+[![Copy Exercise](https://img.shields.io/badge/COPY%20EXERCISE-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=KLIS-CS&template_name=KLIS-CS-Git-Local-Remote-Workflow&owner=%40me&name=cp4-local-remote-workflow&description=Checkpoint+4:+Local+and+Remote+Git+Workflow&visibility=public)
 
-[![Copy Exercise](https://img.shields.io/badge/Copy%20Exercise-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=KLIS-CS&template_name=KLIS-CS-Git-Local-Remote-Workflow&owner=%40me&name=cp4-local-remote-workflow&description=Checkpoint+4:+Local+and+Remote+Git+Workflow&visibility=private)
+Keep the copied repository **Public** so the KLIS-CS mother repository can read the trusted CP4 automatic grader output.
 
 After the copy is created:
 
 1. Open **Actions**.
 2. Select **Start Exercise**.
 3. Choose **Run workflow**.
-4. Read the Exercise Issue that GitHub Actions creates for you.
-5. Clone your copied repository to your computer and complete the checkpoint locally.
+4. Read the Exercise Issue GitHub Actions creates.
+5. Clone the copied repository and complete the checkpoint locally.
 
-> The source repository must be enabled as a GitHub **Template repository** for the Copy Exercise button to work.
-
-## Required Branch
+## Required branch
 
 ```text
 cp4-YOUR-GITHUB-USERNAME
@@ -28,7 +26,7 @@ cp4-YOUR-GITHUB-USERNAME
 
 ## Challenge
 
-Work from a local clone of this repository. Before making changes, inspect the repository with:
+Work from a local clone. Before changing anything, inspect the repository with:
 
 ```bash
 git status
@@ -38,7 +36,7 @@ git remote -v
 
 Create the required checkpoint branch locally, edit only `submission.md`, commit, and push the branch.
 
-Your submission must include commands for both repository-starting routes:
+Your submission must include commands for both starting routes:
 
 ### Route A — GitHub first
 
@@ -54,14 +52,47 @@ local folder → Git repository → connect to GitHub remote
 
 You must also explain `clone`, `push`, `pull`, and the meaning of `origin`.
 
-Then open a Pull Request from the checkpoint branch to `main` and leave it open for grading.
+Open a Pull Request from the checkpoint branch to `main` and leave it open for grading.
 
 ## Scoring
 
 - **60 points** — automatic Git/GitHub evidence and command checks
 - **40 points** — teacher review of correctness and conceptual understanding
 
-When the required Pull Request is open, the grader posts the live score and a fixed **Teacher grading** template directly in that PR.
+Your copied repository runs the automatic grader and maintains a **CP4 — Score** Issue.
+
+## Submit for teacher grading
+
+[![Submit CP4](https://img.shields.io/badge/SUBMIT%20CP4-%E2%86%92-0969da?style=for-the-badge&logo=github)](https://github.com/KLIS-CS/KLIS-CS-Git-Local-Remote-Workflow/issues/new?template=cp4-submission.yml)
+
+The teacher grades from the **KLIS-CS mother repository** using:
+
+```text
+/manual-grade
+Commands: 0/15
+Local/remote model: 0/10
+Data flow: 0/10
+Reflection: 0/5
+
+Feedback:
+Write concise feedback here.
+```
+
+After the teacher grade is published, the student's own **CP4 — Score** Issue pulls the `/40` teacher score and shows the **Final score /100**.
+
+```text
+Student repository
+→ automatic /60
+→ Submit CP4
+→ mother repository /manual-grade /40
+→ teacher grade published
+→ student's CP4 — Score updates
+→ Final score /100
+```
+
+The sync checks automatically about once per hour. Students can also run:
+
+**Actions → CP4 — Student Score → Run workflow**
 
 ## Checkpoint Navigation
 
