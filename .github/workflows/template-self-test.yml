@@ -1,7 +1,10 @@
-name: CP4 Template Self-Test
+name: CP4 Assessment Self-Test
 
 on:
   push:
+    branches: [main]
+    paths: ['README.md','submission.md','TEACHER-GRADING.md','.github/**']
+  pull_request:
     branches: [main]
     paths: ['README.md','submission.md','TEACHER-GRADING.md','.github/**']
 
@@ -13,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Validate CP4 template
         shell: bash
         run: |
@@ -24,4 +28,14 @@ jobs:
           grep -q 'Command 1 — Inspect Repository State' submission.md
           grep -q 'Command 7 — Pull Main' submission.md
           grep -q '/manual-grade' .github/workflows/grade.yml
+          grep -q 'Commands: 0/15' .github/workflows/grade.yml
+          grep -q 'Local/remote model: 0/10' .github/workflows/grade.yml
+          grep -q 'Data flow: 0/10' .github/workflows/grade.yml
+          grep -q 'Reflection: 0/5' .github/workflows/grade.yml
+          grep -q 'fixed template' TEACHER-GRADING.md
           echo 'CP4 template structure is valid.'
+
+      - name: Validate workflow YAML syntax
+        shell: bash
+        run: |
+          ruby -e "require 'yaml'; Dir['.github/workflows/*.yml'].each { |f| YAML.load_file(f); puts \"OK #{f}\" }"
