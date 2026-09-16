@@ -4,6 +4,22 @@
 
 Show that you understand how a local Git repository connects to a GitHub remote repository and can choose the correct command for the direction of data flow.
 
+## Start the exercise
+
+Copy this checkpoint into your own GitHub account:
+
+[![Copy Exercise](https://img.shields.io/badge/Copy%20Exercise-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=KLIS-CS&template_name=KLIS-CS-Git-Local-Remote-Workflow&owner=%40me&name=cp4-local-remote-workflow&description=Checkpoint+4:+Local+and+Remote+Git+Workflow&visibility=private)
+
+After the copy is created:
+
+1. Open **Actions**.
+2. Select **Start Exercise**.
+3. Choose **Run workflow**.
+4. Read the Exercise Issue that GitHub Actions creates for you.
+5. Clone your copied repository to your computer and complete the checkpoint locally.
+
+> The source repository must be enabled as a GitHub **Template repository** for the Copy Exercise button to work.
+
 ## Required Branch
 
 ```text
@@ -44,6 +60,8 @@ Then open a Pull Request from the checkpoint branch to `main` and leave it open 
 
 - **60 points** — automatic Git/GitHub evidence and command checks
 - **40 points** — teacher review of correctness and conceptual understanding
+
+When the required Pull Request is open, the grader posts the live score and a fixed **Teacher grading** template directly in that PR.
 
 ## Checkpoint Navigation
 
