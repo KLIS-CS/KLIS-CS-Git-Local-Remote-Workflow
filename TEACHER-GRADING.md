@@ -14,17 +14,42 @@ Final score: **60 automatic + 40 teacher-reviewed = 100**.
 
 ## Entering the Teacher Grade
 
-Add a Pull Request conversation comment containing:
+Every student Pull Request automatically receives a **Teacher grading** block from the bot. Use the fixed template shown there:
 
 ```text
-/manual-grade 37
+/manual-grade
+Commands: 0/15
+Local/remote model: 0/10
+Data flow: 0/10
+Reflection: 0/5
 
-Commands: 14/15
-Local/remote model: 9/10
-Data flow: 9/10
-Reflection: 5/5
-
-Feedback: ...
+Feedback:
+Write concise feedback here.
 ```
 
-The newest valid `/manual-grade 0-40` comment by `hbycwyh2008` is used.
+Copy it into a **new PR comment**, replace the scores, and add feedback. The workflow calculates the teacher subtotal automatically and combines it with the automatic 60 points.
+
+Example:
+
+```text
+/manual-grade
+Commands: 14/15
+Local/remote model: 9/10
+Data flow: 10/10
+Reflection: 5/5
+
+Feedback:
+Strong mental model. Be more precise about when `git pull` changes the working tree and when you should inspect state first.
+```
+
+The newest valid grading comment by `hbycwyh2008` is used. To revise a grade, post a new completed template.
+
+The older short form remains accepted for compatibility:
+
+```text
+/manual-grade 38
+```
+
+## Recommended teacher check
+
+Look for reasoning, not command memorization. A strong response should distinguish local state from remote state, explain `origin` as a remote name rather than a special Git keyword, and use diagnostic commands such as `git status`, `git branch`, and `git remote -v` before proposing a fix.
