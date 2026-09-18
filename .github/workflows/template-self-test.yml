@@ -3,51 +3,60 @@ name: CP4 Assessment Self-Test
 on:
   push:
     branches: [main]
-    paths: ['README.md','TEACHER-GRADING.md','.github/**']
+    paths: ['README.md','submission.md','TEACHER-GRADING.md','.github/**']
   pull_request:
     branches: [main]
-    paths: ['README.md','TEACHER-GRADING.md','.github/**']
+    paths: ['README.md','submission.md','TEACHER-GRADING.md','.github/**']
 
 permissions:
   contents: read
 
 jobs:
   structural-test:
-    if: ${{ github.repository == 'KLIS-CS/KLIS-CS-Git-Local-Remote-Workflow' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate CP4 template
+      - name: Validate CP4 assessment
         shell: bash
         run: |
           set -euo pipefail
           for f in README.md submission.md TEACHER-GRADING.md .github/pull_request_template.md .github/ISSUE_TEMPLATE/cp4-submission.yml .github/workflows/0-start-exercise.yml .github/workflows/grade.yml .github/workflows/grade-external-submission.yml .github/workflows/student-score.yml .github/workflows/guardrails.yml; do
             test -f "$f" || { echo "Missing $f"; exit 1; }
           done
+
+          grep -q 'git fetch' README.md
+          grep -q 'git pull' README.md
+          grep -q 'APPROVED' README.md
           grep -q 'cp4-YOUR-GITHUB-USERNAME' README.md
-          grep -q 'visibility=public' README.md
-          grep -q 'Submit CP4' README.md
-          grep -q 'original \*\*Exercise Issue\*\*' README.md
-          grep -q 'Do not go to Actions' README.md
-          grep -q 'No manual Actions run is required' README.md
-          grep -q 'Command 1 — Inspect Repository State' submission.md
-          grep -q 'Command 7 — Pull Main' submission.md
-          grep -q '/manual-grade' .github/workflows/grade.yml
-          grep -q 'klis-cp4-mother-score' .github/workflows/grade-external-submission.yml
+
+          grep -q 'Command 8 — Fetch Remote State' submission.md
+          grep -q 'Command 9 — Pull Main' submission.md
+          grep -q 'Question 3' submission.md
+          grep -q 'fetch.*pull' submission.md
+
+          grep -q 'pull_request_review:' .github/workflows/grade.yml
+          grep -q 'listReviews' .github/workflows/grade.yml
+          grep -q "r.state === 'APPROVED'" .github/workflows/grade.yml
+          grep -q 'pr?.head?.sha' .github/workflows/grade.yml
+          grep -q 'mergedAfterApproval' .github/workflows/grade.yml
+          grep -q 'Command 8 — Fetch Remote State' .github/workflows/grade.yml
+          grep -q 'git\\s+fetch\\s+origin' .github/workflows/grade.yml
+          ! grep -q "p.state === 'open'" .github/workflows/grade.yml
+
+          grep -q 'APPROVED' .github/workflows/0-start-exercise.yml
+          grep -q 'APPROVED' .github/pull_request_template.md
+          grep -q 'APPROVED review before I merged' .github/ISSUE_TEMPLATE/cp4-submission.yml
+
+          grep -q 'klis-cp4-progress' .github/workflows/grade-external-submission.yml
           grep -q '.cp4-grades/' .github/workflows/grade-external-submission.yml
           grep -q 'klis-cp4-exercise' .github/workflows/student-score.yml
-          grep -q 'klis-cp4-progress' .github/workflows/student-score.yml
-          grep -q 'updateComment' .github/workflows/student-score.yml
-          ! grep -q "title: 'CP4 — Score'" .github/workflows/student-score.yml
-          ! grep -q "title: 'Checkpoint 4 — Progress'" .github/workflows/grade.yml
-          grep -q 'raw.githubusercontent.com/KLIS-CS/KLIS-CS-Git-Local-Remote-Workflow/grades' .github/workflows/student-score.yml
-          grep -q 'fixed template' TEACHER-GRADING.md
-          grep -q 'branches: \[main\]' .github/workflows/0-start-exercise.yml
-          grep -q "github.repository != 'KLIS-CS/KLIS-CS-Git-Local-Remote-Workflow'" .github/workflows/0-start-exercise.yml
-          echo 'CP4 template structure is valid.'
+
+          grep -q 'Local/remote model: 0/10' TEACHER-GRADING.md
+          grep -q 'fetch' TEACHER-GRADING.md
+          echo 'CP4 assessment structure is valid.'
 
       - name: Validate workflow YAML syntax
         shell: bash
         run: |
-          ruby -e "require 'yaml'; Dir['.github/workflows/*.yml'].each { |f| YAML.load_file(f); puts \"OK #{f}\" }"
+          ruby -e 'require "yaml"; ARGV.each { |f| YAML.load_file(f); puts "OK #{f}" }'             .github/workflows/0-start-exercise.yml             .github/workflows/grade.yml             .github/workflows/grade-external-submission.yml             .github/workflows/student-score.yml             .github/workflows/guardrails.yml             .github/workflows/template-self-test.yml
