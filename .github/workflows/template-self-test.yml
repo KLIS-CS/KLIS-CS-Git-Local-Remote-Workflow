@@ -3,16 +3,17 @@ name: CP4 Assessment Self-Test
 on:
   push:
     branches: [main]
-    paths: ['README.md','submission.md','TEACHER-GRADING.md','.github/**']
+    paths: ['README.md','TEACHER-GRADING.md','.github/**']
   pull_request:
     branches: [main]
-    paths: ['README.md','submission.md','TEACHER-GRADING.md','.github/**']
+    paths: ['README.md','TEACHER-GRADING.md','.github/**']
 
 permissions:
   contents: read
 
 jobs:
   structural-test:
+    if: ${{ github.repository == 'KLIS-CS/KLIS-CS-Git-Local-Remote-Workflow' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,13 +22,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in README.md submission.md TEACHER-GRADING.md .github/pull_request_template.md .github/ISSUE_TEMPLATE/cp4-submission.yml .github/workflows/0-start-exercise.yml .github/workflows/grade.yml .github/workflows/grade-external-submission.yml .github/workflows/student-score.yml .github/workflows/guardrails.yml; do
+          for f in README.md submission.md TEACHER-GRADING.md .github/pull_request_template.md .github/ISSUE_TEMPLATE/cp4-submission.yml .github/workflows/grade.yml .github/workflows/grade-external-submission.yml .github/workflows/student-score.yml .github/workflows/guardrails.yml; do
             test -f "$f" || { echo "Missing $f"; exit 1; }
           done
           grep -q 'cp4-YOUR-GITHUB-USERNAME' README.md
           grep -q 'visibility=public' README.md
           grep -q 'Submit CP4' README.md
           grep -q 'CP4 — Score' README.md
+          grep -q 'Do not go to Actions' README.md
+          grep -q 'No manual Actions run is required' README.md
           grep -q 'Command 1 — Inspect Repository State' submission.md
           grep -q 'Command 7 — Pull Main' submission.md
           grep -q '/manual-grade' .github/workflows/grade.yml
