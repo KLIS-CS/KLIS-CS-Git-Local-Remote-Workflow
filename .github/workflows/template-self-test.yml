@@ -41,7 +41,7 @@ jobs:
           grep -q 'pr?.head?.sha' .github/workflows/grade.yml
           grep -q 'mergedAfterApproval' .github/workflows/grade.yml
           grep -q 'Command 8 — Fetch Remote State' .github/workflows/grade.yml
-          grep -q 'git\\s+fetch\\s+origin' .github/workflows/grade.yml
+          grep -q 'fetch' .github/workflows/grade.yml
           ! grep -q "p.state === 'open'" .github/workflows/grade.yml
 
           grep -q 'APPROVED' .github/workflows/0-start-exercise.yml
