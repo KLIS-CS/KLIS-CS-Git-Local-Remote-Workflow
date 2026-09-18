@@ -199,6 +199,7 @@ jobs:
             ## Checkpoint 4 Progress
 
             **Student:** @${username}  
+            **Repository:** https://github.com/${owner}/${repo}  
             **Automatic:** ${automatic}/60  
             **Teacher:** ${manual ? `${teacher}/40 by @${manual.grader}` : 'awaiting review'}  
             **Current total:** ${total}/100
