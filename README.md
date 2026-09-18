@@ -68,9 +68,9 @@ local folder
 You must also explain:
 
 - `origin`;
-- `push`;
-- `fetch`;
-- `pull`;
+- `git push`;
+- `git fetch`;
+- `git pull`;
 - the difference between `fetch` and `pull`;
 - how to inspect branch and remote state before acting.
 
