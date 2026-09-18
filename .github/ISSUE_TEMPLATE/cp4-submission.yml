@@ -7,22 +7,11 @@ body:
       value: |
         Submit the **repository URL** for your completed CP4 copy. Keep the copied repository Public so the KLIS-CS mother grader can read the trusted CP4 automatic grader output.
 
-  - type: input
-    id: repo
+  - type: markdown
     attributes:
-      label: Practice Repository URL
-      description: Paste the repository URL. Nested GitHub URLs such as /tree/main are accepted.
-      placeholder: https://github.com/YOUR-USERNAME/cp4-local-remote-workflow
-    validations:
-      required: true
-
-  - type: input
-    id: username
-    attributes:
-      label: GitHub Username
-      placeholder: YOUR-GITHUB-USERNAME
-    validations:
-      required: true
+      value: |
+        **Repository URL and GitHub username are detected automatically from the account that opens this submission.**
+        The detected repository URL will be written into this Issue automatically.
 
   - type: checkboxes
     id: integrity
