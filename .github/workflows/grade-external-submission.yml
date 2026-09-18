@@ -122,13 +122,15 @@ jobs:
             const statedUsername = section('GitHub Username').replace(/^@/, '').trim() || student;
 
             if (repositoryUrl && !section('Practice Repository URL')) {
-              const autoDetected = `${issue.body || ''}
-
-### Practice Repository URL
-${repositoryUrl}
-
-### GitHub Username
-${student}`;
+              const autoDetected = [
+                issue.body || '',
+                '',
+                '### Practice Repository URL',
+                repositoryUrl,
+                '',
+                '### GitHub Username',
+                student
+              ].join('\\n');
               await github.rest.issues.update({
                 owner, repo, issue_number: issueNumber, body: autoDetected
               });
