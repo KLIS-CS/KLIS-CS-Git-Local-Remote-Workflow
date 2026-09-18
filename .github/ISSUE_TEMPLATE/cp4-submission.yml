@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Submit the **repository URL** for your completed CP4 copy. Keep the copied repository Public so the KLIS-CS mother grader can read the trusted CP4 automatic grader output.
+        The completed public CP4 repository is detected automatically from the GitHub account that opens this submission. Keep the copied repository Public so the mother grader can read the trusted CP4 automatic grader output.
 
   - type: markdown
     attributes:
