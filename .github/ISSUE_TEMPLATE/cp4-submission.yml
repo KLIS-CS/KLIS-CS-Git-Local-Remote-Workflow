@@ -1,26 +1,32 @@
 name: "Submit CP4"
-description: "Submit your public CP4 practice repository for automatic and teacher grading."
+description: "Submit your completed public CP4 practice repository for automatic and teacher grading."
 title: "[CP4] Local ↔ Remote Submission"
 body:
   - type: markdown
     attributes:
       value: |
-        The completed public CP4 repository is detected automatically from the GitHub account that opens this submission. Keep the copied repository Public so the mother grader can read the trusted CP4 automatic grader output.
+        Submit only after the CP4 Pull Request has received an **APPROVED** review and has been merged into `main`.
+
+        The public CP4 repository is detected automatically from the GitHub account that opens this submission.
 
   - type: markdown
     attributes:
       value: |
-        **Repository URL and GitHub username are detected automatically from the account that opens this submission.**
-        The detected repository URL will be written into this Issue automatically.
+        **Repository URL and GitHub username are detected automatically.**
+        Do not enter a PR number or repository URL manually.
 
   - type: checkboxes
     id: integrity
     attributes:
-      label: Integrity Check
+      label: Completion Check
       options:
         - label: I used the official KLIS-CS CP4 Copy Exercise.
           required: true
-        - label: My CP4 branch and open Pull Request are visible in this repository.
+        - label: My CP4 branch and Pull Request used the required branch → main direction.
+          required: true
+        - label: Another GitHub user submitted an APPROVED review before I merged the Pull Request.
+          required: true
+        - label: The Pull Request is merged into main.
           required: true
         - label: I did not include passwords, API keys, tokens, or other secrets.
           required: true
