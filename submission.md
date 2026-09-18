@@ -1,6 +1,6 @@
 # Checkpoint 4 Submission — Local ↔ Remote
 
-Complete every field.
+Complete this file on your required CP4 branch. The grader reads the Pull Request's stored head commit, so the branch may be deleted after merge.
 
 Name:
 
@@ -10,59 +10,77 @@ Required Branch:
 
 ## Command 1 — Inspect Repository State
 
-What command would you use to inspect repository state?
+What command inspects working-tree and staging state?
 
 Answer:
 
-## Command 2 — Inspect Remotes
+## Command 2 — Inspect Current Branch
 
-What command would you use to inspect configured remotes?
+What command shows your current branch and its upstream/tracking information?
 
 Answer:
 
-## Command 3 — GitHub First
+## Command 3 — Inspect Remotes
+
+What command shows configured remote names and URLs?
+
+Answer:
+
+## Command 4 — GitHub First
 
 What command copies an existing GitHub repository to your computer?
 
 Answer:
 
-## Command 4 — Local First
+## Command 5 — Local First
 
 What command turns a local folder into a Git repository?
 
 Answer:
 
-## Command 5 — Connect Origin
+## Command 6 — Connect Origin
 
 What command connects a local repository to a GitHub remote named `origin`?
 
 Answer:
 
-## Command 6 — Push Branch
+## Command 7 — Push Branch
 
-What command pushes your checkpoint branch to `origin`?
+What command pushes your CP4 branch to `origin` and can set its upstream?
 
 Answer:
 
-## Command 7 — Pull Main
+## Command 8 — Fetch Remote State
 
-What command brings changes from `origin/main` into your current local branch?
+What command updates your remote-tracking information from `origin` without automatically merging it into your current branch?
+
+Answer:
+
+## Command 9 — Pull Main
+
+What command fetches and integrates `origin/main` into your current branch?
 
 Answer:
 
 ## Question 1
 
-What does `origin` mean in Git?
+What does `origin` mean in Git? Is it a special server, a branch, or something else?
 
 Answer:
 
 ## Question 2
 
-For each command, state the main direction of information flow: `git clone`, `git push`, and `git pull`.
+Describe the main direction of information flow for `git clone`, `git push`, `git fetch`, and `git pull`.
 
 Answer:
 
 ## Question 3
+
+What is the practical difference between `git fetch` and `git pull`?
+
+Answer:
+
+## Question 4
 
 What is the practical difference between starting with `git clone` and starting with `git init` + `git remote add origin ...`?
 
@@ -70,6 +88,6 @@ Answer:
 
 ## Reflection
 
-Which diagnostic command would you run first if you were unsure what Git repository state you were in, and why?
+If you were unsure whether your local repository, branch, or remote were configured correctly, which diagnostic commands would you run first and why?
 
 Answer:
