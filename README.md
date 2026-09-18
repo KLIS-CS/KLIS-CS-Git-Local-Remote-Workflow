@@ -18,7 +18,7 @@ After the copy is created:
 4. Create the required `cp4-YOUR-GITHUB-USERNAME` branch locally.
 5. Complete only `submission.md`, commit your work, and push the branch.
 6. Open a Pull Request from your checkpoint branch to `main` and leave it open for grading.
-7. Check the automatically created **CP4 — Score** Issue for your score and feedback.
+7. Check the original **Exercise Issue** for the automatically updated score table and feedback.
 
 > **Do not go to Actions and do not run a workflow manually.** Your Git push and Pull Request automatically start the grader.
 
@@ -63,7 +63,7 @@ Open a Pull Request from the checkpoint branch to `main` and leave it open for g
 - **60 points** — automatic Git/GitHub evidence and command checks
 - **40 points** — teacher review of correctness and conceptual understanding
 
-Your copied repository runs the automatic grader and maintains a **CP4 — Score** Issue.
+Your copied repository uses one **Exercise Issue** as the student-facing status page. The automatic grader updates the score table in that same Issue; it does not create separate Progress or Score Issues.
 
 ## Submit for teacher grading
 
@@ -82,7 +82,7 @@ Feedback:
 Write concise feedback here.
 ```
 
-After the teacher grade is published, the student's own **CP4 — Score** Issue pulls the `/40` teacher score and shows the **Final score /100**.
+After the teacher grade is published, the `/40` teacher score and feedback are synchronized into the student's original **Exercise Issue**.
 
 ```text
 Student repository
@@ -90,7 +90,7 @@ Student repository
 → Submit CP4
 → mother repository /manual-grade /40
 → teacher grade published
-→ student's CP4 — Score updates
+→ student's original Exercise Issue updates
 → Final score /100
 ```
 
