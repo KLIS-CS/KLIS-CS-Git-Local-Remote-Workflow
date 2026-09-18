@@ -147,110 +147,70 @@ jobs:
             ];
 
             const automatic = checks.reduce((s, c) => s + c[1], 0);
-
-            let prComments = [];
-            let manual = null;
-            if (pr) {
-              prComments = await github.paginate(github.rest.issues.listComments, {
-                owner, repo, issue_number: pr.number, per_page: 100
-              });
-              for (const c of [...prComments].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))) {
-                if (!allowedGraders.has(c.user?.login?.toLowerCase())) continue;
-                const parsed = parseManualGrade(c.body || '');
-                if (parsed) {
-                  manual = { ...parsed, grader: c.user.login };
-                  break;
-                }
-              }
-            }
-
-            const teacher = manual?.score ?? 0;
-            const total = automatic + teacher;
             const rows = checks.map(([label, earned, max, detail]) =>
               `| ${earned === max ? '✅' : earned ? '🟨' : '⬜'} ${label} | ${earned}/${max} | ${detail} |`
             ).join('\n');
 
             const status = automatic < 60
               ? '🟡 **IN PROGRESS — complete the missing automatic evidence.**'
-              : !manual
-                ? '🔵 **AUTOMATIC CHECKS PASSED — awaiting teacher review.**'
-                : `✅ **FINAL SCORE: ${total}/100**`;
+              : '🔵 **AUTOMATIC CHECKS PASSED — ready for teacher review.**';
 
-            const breakdownText = manual?.breakdown
-              ? `Commands ${manual.breakdown.commands}/15 · Local/remote model ${manual.breakdown.model}/10 · Data flow ${manual.breakdown.flow}/10 · Reflection ${manual.breakdown.reflection}/5`
-              : manual
-                ? 'Teacher used the short-form manual score.'
-                : 'Not graded yet.';
+            const defaultTeacherBlock = `<!-- klis-cp4-teacher-sync-start -->
+            ### 🧑‍🏫 Teacher review
 
-            const teacherTemplate = [
-              '```text',
-              '/manual-grade',
-              'Commands: 0/15',
-              'Local/remote model: 0/10',
-              'Data flow: 0/10',
-              'Reflection: 0/5',
-              '',
-              'Feedback:',
-              'Write concise feedback here.',
-              '```'
-            ].join('\n');
+            **Teacher score:** awaiting review  
+            **Final score:** pending teacher review
+
+            Teacher feedback will appear here after grading in the mother repository.
+            <!-- klis-cp4-teacher-sync-end -->`;
 
             const progressBody = `${marker}
-            ## Checkpoint 4 Progress
+            ## CP4 — Progress & Score
 
             **Student:** @${username}  
             **Repository:** https://github.com/${owner}/${repo}  
-            **Automatic:** ${automatic}/60  
-            **Teacher:** ${manual ? `${teacher}/40 by @${manual.grader}` : 'awaiting review'}  
-            **Current total:** ${total}/100
+            **Automatic:** ${automatic}/60
 
             | Check | Score | Evidence |
             |---|---:|---|
             ${rows}
-            | 🧑‍🏫 Teacher review | ${manual ? `${teacher}/40` : '—/40'} | ${manual ? `graded by @${manual.grader}` : 'awaiting review'} |
 
             ${status}
 
-            ### 🧑‍🏫 Teacher grading
+            **If a row is incomplete, fix \`submission.md\` or the Git/PR evidence on the feature branch and push again. This same table updates automatically.**
 
-            **Current teacher breakdown:** ${breakdownText}
+            ## Submit for teacher review
 
-            Copy the fixed template below into a **new PR comment**, replace the scores, and add feedback. The workflow calculates the teacher subtotal automatically.
+            [Submit CP4 to the mother repository](https://github.com/KLIS-CS/KLIS-CS-Git-Local-Remote-Workflow/issues/new?template=cp4-submission.yml)
 
-            ${teacherTemplate}`;
+            ${defaultTeacherBlock}`;
 
-            if (pr) {
-              const old = prComments.find(c => c.user?.type === 'Bot' && c.body?.includes(marker));
-              if (old) {
-                await github.rest.issues.updateComment({ owner, repo, comment_id: old.id, body: progressBody });
-              } else {
-                await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body: progressBody });
-              }
-            } else {
-              const allIssues = await github.paginate(github.rest.issues.listForRepo, {
-                owner, repo, state: 'all', per_page: 100
-              });
-              let progress = allIssues.find(i => !i.pull_request && i.body?.includes(marker));
-              if (!progress) {
-                progress = (await github.rest.issues.create({
-                  owner, repo, title: 'Checkpoint 4 — Progress', body: marker
-                })).data;
-              }
-              const comments = await github.paginate(github.rest.issues.listComments, {
-                owner, repo, issue_number: progress.number, per_page: 100
-              });
-              const old = comments.find(c => c.user?.type === 'Bot' && c.body?.includes(marker));
-              if (old) {
-                await github.rest.issues.updateComment({ owner, repo, comment_id: old.id, body: progressBody });
-              } else {
-                await github.rest.issues.createComment({ owner, repo, issue_number: progress.number, body: progressBody });
-              }
+            const allIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: 'all', per_page: 100
+            });
+            let exercise = allIssues.find(i => !i.pull_request && i.body?.includes('<!-- klis-cp4-exercise -->'));
+            if (!exercise) {
+              exercise = (await github.rest.issues.create({
+                owner, repo,
+                title: 'Exercise: Checkpoint 4 — Local ↔ Remote Mental Model',
+                body: '<!-- klis-cp4-exercise -->\n## Checkpoint 4 — Local ↔ Remote Mental Model'
+              })).data;
             }
 
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: exercise.number, per_page: 100
+            });
+            const old = comments.find(c => c.user?.type === 'Bot' && c.body?.includes(marker));
+            let finalBody = progressBody;
+            const teacherMatch = old?.body?.match(/<!-- klis-cp4-teacher-sync-start -->[\s\S]*?<!-- klis-cp4-teacher-sync-end -->/);
+            if (teacherMatch) finalBody = finalBody.replace(defaultTeacherBlock, teacherMatch[0]);
+
+            if (old) await github.rest.issues.updateComment({ owner, repo, comment_id: old.id, body: finalBody });
+            else await github.rest.issues.createComment({ owner, repo, issue_number: exercise.number, body: finalBody });
+
             await core.summary
-              .addHeading(`Checkpoint 4: ${total}/100`)
+              .addHeading(`Checkpoint 4: ${automatic}/60 automatic`)
               .addRaw(`Automatic: ${automatic}/60\n`)
-              .addRaw(`Teacher: ${manual ? `${teacher}/40` : 'awaiting review'}\n`)
               .write();
 
             if (automatic !== 60 && ['push', 'pull_request_target'].includes(context.eventName)) {
