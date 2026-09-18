@@ -2,25 +2,41 @@
 
 ## Goal
 
-Show that you understand how a local Git repository connects to a GitHub remote repository and can choose the correct command for the direction of data flow.
+Show that you understand what lives locally, what lives on GitHub, and which Git command moves or synchronizes information between them.
+
+CP4 focuses on this model:
+
+```text
+working tree
+↕
+staging area
+↕
+local commits
+↕ push / fetch / pull
+remote repository (origin)
+```
+
+You will still use the complete branch → PR → review → merge workflow, but the main assessment focus is your **local/remote mental model**.
 
 ## Start the exercise
 
 [![Copy Exercise](https://img.shields.io/badge/COPY%20EXERCISE-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=KLIS-CS&template_name=KLIS-CS-Git-Local-Remote-Workflow&owner=%40me&name=cp4-local-remote-workflow&description=Checkpoint+4:+Local+and+Remote+Git+Workflow&visibility=public)
 
-Keep the copied repository **Public** so the KLIS-CS mother repository can read the trusted CP4 automatic grader output.
+Keep the copied repository **Public**.
 
 After the copy is created:
 
-1. In your copied repository, click **Code** and copy the HTTPS clone URL.
-2. Clone your copied repository to your computer.
-3. Inspect the repository with `git status`, `git branch`, and `git remote -v`.
-4. Create the required `cp4-YOUR-GITHUB-USERNAME` branch locally.
-5. Complete only `submission.md`, commit your work, and push the branch.
-6. Open a Pull Request from your checkpoint branch to `main` and leave it open for grading.
-7. Check the original **Exercise Issue** for the automatically updated score table and feedback.
+1. Copy the HTTPS clone URL.
+2. Clone the repository locally.
+3. Inspect state with `git status`, `git branch -vv`, and `git remote -v`.
+4. Create `cp4-YOUR-GITHUB-USERNAME` locally.
+5. Complete only `submission.md`, commit, and push the branch.
+6. Open a Pull Request to `main`.
+7. Request review from another GitHub user.
+8. Receive an **APPROVED** review and then merge.
+9. Check the original **Exercise Issue** for the score.
 
-> **Do not go to Actions and do not run a workflow manually.** Your Git push and Pull Request automatically start the grader.
+Do **not** manually run Actions.
 
 ## Required branch
 
@@ -30,46 +46,52 @@ cp4-YOUR-GITHUB-USERNAME
 
 ## Challenge
 
-Work from a local clone. Before changing anything, inspect the repository with:
-
-```bash
-git status
-git branch
-git remote -v
-```
-
-Create the required checkpoint branch locally, edit only `submission.md`, commit, and push the branch.
-
-Your submission must include commands for both starting routes:
+Your submission must demonstrate both starting routes:
 
 ### Route A — GitHub first
 
 ```text
-GitHub repository → local computer
+GitHub repository
+→ git clone
+→ local repository
 ```
 
 ### Route B — Local first
 
 ```text
-local folder → Git repository → connect to GitHub remote
+local folder
+→ git init
+→ git remote add origin ...
+→ connected local repository
 ```
 
-You must also explain `clone`, `push`, `pull`, and the meaning of `origin`.
+You must also explain:
 
-Open a Pull Request from the checkpoint branch to `main` and leave it open for grading.
+- `origin`;
+- `push`;
+- `fetch`;
+- `pull`;
+- the difference between `fetch` and `pull`;
+- how to inspect branch and remote state before acting.
+
+After opening the PR, get a human **APPROVED** review before merge. Deleting the feature branch after merge is allowed because the grader uses the PR's stored head SHA and review history.
 
 ## Scoring
 
 - **60 points** — automatic Git/GitHub evidence and command checks
 - **40 points** — teacher review of correctness and conceptual understanding
 
-Your copied repository uses one **Exercise Issue** as the student-facing status page. The automatic grader updates the score table in that same Issue; it does not create separate Progress or Score Issues.
+Automatic evidence includes the required branch identity, commit evidence, PR target, command answers, conceptual answers, approval-before-merge, and final merge.
 
 ## Submit for teacher grading
 
+Submit only after review and merge:
+
 [![Submit CP4](https://img.shields.io/badge/SUBMIT%20CP4-%E2%86%92-0969da?style=for-the-badge&logo=github)](https://github.com/KLIS-CS/KLIS-CS-Git-Local-Remote-Workflow/issues/new?template=cp4-submission.yml)
 
-The teacher grades from the **KLIS-CS mother repository** using:
+Repository URL and GitHub username are detected automatically.
+
+Teacher grading:
 
 ```text
 /manual-grade
@@ -82,19 +104,7 @@ Feedback:
 Write concise feedback here.
 ```
 
-After the teacher grade is published, the `/40` teacher score and feedback are synchronized into the student's original **Exercise Issue**.
-
-```text
-Student repository
-→ automatic /60
-→ Submit CP4
-→ mother repository /manual-grade /40
-→ teacher grade published
-→ student's original Exercise Issue updates
-→ Final score /100
-```
-
-The score syncs automatically after local grading and checks again about once per hour for a published teacher grade. **No manual Actions run is required.**
+The teacher score synchronizes back to the original **Exercise Issue**.
 
 ## Checkpoint Navigation
 
