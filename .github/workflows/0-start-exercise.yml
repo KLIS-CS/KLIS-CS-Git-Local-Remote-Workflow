@@ -37,11 +37,14 @@ jobs:
 
             ### Your task
 
-            1. Clone this repository and inspect it with \`git status\`, \`git branch\`, and \`git remote -v\`.
-            2. Create and switch to \`${branch}\`.
-            3. Complete \`submission.md\` on that branch.
-            4. Commit and push \`${branch}\` to GitHub.
-            5. Open a Pull Request from \`${branch}\` → \`main\` and leave it open for grading.
+            - [ ] Clone this repository.
+            - [ ] Inspect it with `git status`, `git branch -vv`, and `git remote -v`.
+            - [ ] Create and switch to `${branch}`.
+            - [ ] Complete only `submission.md`, commit, and push the branch.
+            - [ ] Open a Pull Request from `${branch}` → `main`.
+            - [ ] Request review from another GitHub user.
+            - [ ] Receive an **APPROVED** review.
+            - [ ] Merge only after approval.
 
             ### Automatic grading
 
