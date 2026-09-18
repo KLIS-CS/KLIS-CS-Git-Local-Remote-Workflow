@@ -4,7 +4,6 @@ on:
   workflow_run:
     workflows: ["Checkpoint 4 — Auto and Teacher Grade"]
     types: [completed]
-  workflow_dispatch:
   schedule:
     - cron: '39 * * * *'
 
@@ -81,7 +80,7 @@ jobs:
             ## Submit for teacher review
             [Submit CP4 to the mother repository](https://github.com/KLIS-CS/KLIS-CS-Git-Local-Remote-Workflow/issues/new?template=cp4-submission.yml)
 
-            After the teacher grades in the mother repository, this Issue refreshes automatically within about one hour. You can also run **Actions → CP4 — Student Score → Run workflow**.
+            After the teacher grades in the mother repository, this Issue refreshes automatically within about one hour. No manual Actions run is required.
             `;
 
             let scoreIssue = issues.find(i => !i.pull_request && i.body?.includes(scoreMarker));
