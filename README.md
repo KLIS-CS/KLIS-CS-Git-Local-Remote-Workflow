@@ -12,11 +12,15 @@ Keep the copied repository **Public** so the KLIS-CS mother repository can read 
 
 After the copy is created:
 
-1. Open **Actions**.
-2. Select **Start Exercise**.
-3. Choose **Run workflow**.
-4. Read the Exercise Issue GitHub Actions creates.
-5. Clone the copied repository and complete the checkpoint locally.
+1. In your copied repository, click **Code** and copy the HTTPS clone URL.
+2. Clone your copied repository to your computer.
+3. Inspect the repository with `git status`, `git branch`, and `git remote -v`.
+4. Create the required `cp4-YOUR-GITHUB-USERNAME` branch locally.
+5. Complete only `submission.md`, commit your work, and push the branch.
+6. Open a Pull Request from your checkpoint branch to `main` and leave it open for grading.
+7. Check the automatically created **CP4 — Score** Issue for your score and feedback.
+
+> **Do not go to Actions and do not run a workflow manually.** Your Git push and Pull Request automatically start the grader.
 
 ## Required branch
 
@@ -90,9 +94,7 @@ Student repository
 → Final score /100
 ```
 
-The sync checks automatically about once per hour. Students can also run:
-
-**Actions → CP4 — Student Score → Run workflow**
+The score syncs automatically after local grading and checks again about once per hour for a published teacher grade. **No manual Actions run is required.**
 
 ## Checkpoint Navigation
 
