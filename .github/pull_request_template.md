@@ -1,12 +1,20 @@
-## Checkpoint 4 Submission
+## Checkpoint 4 — Local ↔ Remote Mental Model
+
+### Before requesting review
 
 - [ ] I used the required `cp4-YOUR-GITHUB-USERNAME` branch.
 - [ ] I worked from a local clone.
-- [ ] I used `git status`, `git branch`, and `git remote -v` to inspect repository state.
+- [ ] I inspected state with `git status`, `git branch -vv`, and `git remote -v`.
 - [ ] I completed every prompt in `submission.md`.
-- [ ] I did not work directly on `main`.
-- [ ] I will leave this Pull Request open for teacher review.
+- [ ] I changed only `submission.md`.
+- [ ] This Pull Request targets `main`.
 
-### Diagnostic command I used most
+### Review and merge
 
-Write the command and why it helped.
+- [ ] I will request review from another GitHub user.
+- [ ] I will wait for an **APPROVED** review before merging.
+- [ ] I will merge only after approval.
+
+### Diagnostic command I found most useful
+
+Write the command and explain why.
