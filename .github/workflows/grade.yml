@@ -1,4 +1,4 @@
-name: Checkpoint 4 — Auto and Teacher Grade
+name: Checkpoint 4 — Auto Grade
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
   pull_request_target:
     types: [opened, reopened, synchronize, edited, closed]
     branches: [main]
-  issue_comment:
-    types: [created, edited]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
 
 permissions:
   contents: read
@@ -16,7 +16,6 @@ permissions:
 
 jobs:
   grade:
-    if: ${{ github.event_name != 'issue_comment' || github.event.issue.pull_request }}
     runs-on: ubuntu-latest
 
     steps:
@@ -26,40 +25,10 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const marker = '<!-- klis-cp4-progress -->';
-            const allowedGraders = new Set(['hbycwyh2008']);
-
-            function parseManualGrade(body) {
-              if (!body) return null;
-              const legacy = body.match(/(?:^|\n)\s*\/manual-grade\s+(40|[0-3]?\d)(?:\s|$)/i);
-              if (legacy) return { score: Number(legacy[1]), breakdown: null, format: 'short' };
-              if (!/(?:^|\n)\s*\/manual-grade\s*(?:\n|$)/i.test(body)) return null;
-
-              const readScore = (label, max) => {
-                const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const m = body.match(new RegExp(`^\\s*${escaped}:\\s*([0-9]|1[0-5])\\s*\\/\\s*${max}\\s*$`, 'mi'));
-                if (!m) return null;
-                const n = Number(m[1]);
-                return n <= max ? n : null;
-              };
-
-              const breakdown = {
-                commands: readScore('Commands', 15),
-                model: readScore('Local/remote model', 10),
-                flow: readScore('Data flow', 10),
-                reflection: readScore('Reflection', 5)
-              };
-              if (Object.values(breakdown).some(v => v === null)) return null;
-              return {
-                score: breakdown.commands + breakdown.model + breakdown.flow + breakdown.reflection,
-                breakdown,
-                format: 'template'
-              };
-            }
 
             let eventPR = null;
-            if (context.eventName === 'pull_request_target') eventPR = context.payload.pull_request;
-            if (context.eventName === 'issue_comment') {
-              eventPR = (await github.rest.pulls.get({ owner, repo, pull_number: context.payload.issue.number })).data;
+            if (['pull_request_target', 'pull_request_review'].includes(context.eventName)) {
+              eventPR = context.payload.pull_request;
             }
 
             const username = eventPR ? eventPR.user.login : context.actor;
@@ -73,20 +42,26 @@ jobs:
               if (e.status !== 404) throw e;
             }
 
-            let aheadBy = 0;
-            if (branchExists) {
-              try {
-                const cmp = await github.rest.repos.compareCommitsWithBasehead({ owner, repo, basehead: `main...${branch}` });
-                aheadBy = cmp.data.ahead_by || 0;
-              } catch (e) {
-                core.warning(e.message);
-              }
-            }
+            const pulls = await github.paginate(github.rest.pulls.list, {
+              owner, repo, state: 'all', per_page: 100
+            });
+            const candidates = pulls
+              .filter(p =>
+                p.head.ref === branch &&
+                p.base.ref === 'main' &&
+                p.user.login.toLowerCase() === username.toLowerCase()
+              )
+              .sort((a, b) => b.number - a.number);
 
-            const read = async path => {
-              if (!branchExists) return '';
+            const prSummary = candidates[0] || null;
+            const pr = prSummary
+              ? (await github.rest.pulls.get({ owner, repo, pull_number: prSummary.number })).data
+              : null;
+
+            const readAt = async (filePath, ref) => {
+              if (!ref) return '';
               try {
-                const r = await github.rest.repos.getContent({ owner, repo, path, ref: branch });
+                const r = await github.rest.repos.getContent({ owner, repo, path: filePath, ref });
                 if (Array.isArray(r.data) || !r.data.content) return '';
                 return Buffer.from(r.data.content, r.data.encoding).toString('utf8');
               } catch (e) {
@@ -95,65 +70,129 @@ jobs:
               }
             };
 
-            const submission = await read('submission.md');
-            const field = label => submission.match(new RegExp(`^${label}:\\s*(\\S.*)$`, 'mi'))?.[1]?.trim() || '';
-            const answer = heading => submission.match(new RegExp(`## ${heading}[\\s\\S]*?\\nAnswer:\\s*([\\s\\S]*?)(?=\\n## |$)`, 'i'))?.[1]?.trim() || '';
+            const headRef = pr?.head?.sha || (branchExists ? branch : null);
+            const submission = await readAt('submission.md', headRef);
+
+            let commitCount = 0;
+            if (pr) {
+              const commits = await github.paginate(github.rest.pulls.listCommits, {
+                owner, repo, pull_number: pr.number, per_page: 100
+              });
+              commitCount = commits.length;
+            } else if (branchExists) {
+              try {
+                const cmp = await github.rest.repos.compareCommits({ owner, repo, base: 'main', head: branch });
+                commitCount = cmp.data.ahead_by || 0;
+              } catch (e) {
+                core.info(`Compare failed: ${e.message}`);
+              }
+            }
+
+            let changedNames = [];
+            if (pr) {
+              const files = await github.paginate(github.rest.pulls.listFiles, {
+                owner, repo, pull_number: pr.number, per_page: 100
+              });
+              changedNames = files.map(f => f.filename);
+            }
+            const allowedFiles =
+              Boolean(pr) &&
+              changedNames.includes('submission.md') &&
+              changedNames.every(name => name === 'submission.md');
+
+            const field = label =>
+              submission.match(new RegExp(`^${label}:\\s*(\\S.*)$`, 'mi'))?.[1]?.trim() || '';
+            const answer = heading =>
+              submission.match(new RegExp(`## ${heading}[\\s\\S]*?\\nAnswer:\\s*([\\s\\S]*?)(?=\\n## |$)`, 'i'))?.[1]?.trim() || '';
 
             const headings = [
               'Command 1 — Inspect Repository State',
-              'Command 2 — Inspect Remotes',
-              'Command 3 — GitHub First',
-              'Command 4 — Local First',
-              'Command 5 — Connect Origin',
-              'Command 6 — Push Branch',
-              'Command 7 — Pull Main'
+              'Command 2 — Inspect Current Branch',
+              'Command 3 — Inspect Remotes',
+              'Command 4 — GitHub First',
+              'Command 5 — Local First',
+              'Command 6 — Connect Origin',
+              'Command 7 — Push Branch',
+              'Command 8 — Fetch Remote State',
+              'Command 9 — Pull Main'
             ];
             const answers = Object.fromEntries(headings.map(h => [h, answer(h)]));
             const validators = [
               /\bgit\s+status\b/i,
+              /\bgit\s+branch\s+-vv\b/i,
               /\bgit\s+remote\s+-v\b/i,
               /\bgit\s+clone\s+\S+/i,
               /\bgit\s+init\b/i,
               /\bgit\s+remote\s+add\s+origin\s+\S+/i,
               new RegExp(`\\bgit\\s+push(?:\\s+-u|\\s+--set-upstream)?\\s+origin\\s+${branch}\\b`, 'i'),
+              /\bgit\s+fetch\s+origin\b/i,
               /\bgit\s+pull\s+origin\s+main\b/i
             ];
-            const points = [3, 3, 3, 3, 3, 3, 2];
+            const points = [1, 1, 2, 2, 1, 2, 2, 2, 2];
             let commandScore = 0;
             validators.forEach((v, i) => {
               if (v.test(answers[headings[i]] || '')) commandScore += points[i];
             });
 
-            const conceptsComplete =
-              ['Name', 'GitHub Username', 'Required Branch'].every(field) &&
-              ['Question 1', 'Question 2', 'Question 3', 'Reflection'].every(answer);
+            const submittedUsername = field('GitHub Username').replace(/^@/, '').trim();
+            const submittedBranch = field('Required Branch').replace(/^`|`$/g, '').trim();
+            const metadataCorrect =
+              submittedUsername.toLowerCase() === username.toLowerCase() &&
+              submittedBranch.toLowerCase() === branch.toLowerCase();
 
-            const pulls = await github.paginate(github.rest.pulls.list, {
-              owner, repo, state: 'all', per_page: 100
-            });
-            const pr = pulls.find(p =>
-              p.head.ref === branch &&
-              p.base.ref === 'main' &&
-              p.user.login.toLowerCase() === username.toLowerCase() &&
-              p.state === 'open'
-            );
+            const conceptsComplete =
+              Boolean(field('Name')) &&
+              metadataCorrect &&
+              ['Question 1', 'Question 2', 'Question 3', 'Question 4', 'Reflection']
+                .every(h => Boolean(answer(h)));
+
+            const reviews = pr
+              ? await github.paginate(github.rest.pulls.listReviews, {
+                  owner, repo, pull_number: pr.number, per_page: 100
+                })
+              : [];
+            const approvals = reviews
+              .filter(r =>
+                r.state === 'APPROVED' &&
+                r.user?.type === 'User' &&
+                r.user?.login?.toLowerCase() !== username.toLowerCase() &&
+                r.submitted_at
+              )
+              .sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at));
+
+            const approvedBeforeMerge = approvals.find(r =>
+              !pr?.merged_at || new Date(r.submitted_at) <= new Date(pr.merged_at)
+            ) || null;
+            const mergedAfterApproval = Boolean(pr?.merged_at && approvedBeforeMerge);
+            const correctBranch = Boolean(pr?.head?.ref === branch) || branchExists;
 
             const checks = [
-              ['Correct checkpoint branch', branchExists ? 10 : 0, 10, branchExists ? branch : `expected ${branch}`],
-              ['At least one commit ahead of main', aheadBy > 0 ? 10 : 0, 10, aheadBy > 0 ? `${aheadBy} commit(s)` : 'no commit detected'],
-              ['Pull Request targets main', pr ? 10 : 0, 10, pr ? `PR #${pr.number}` : 'open required PR'],
-              ['Required Git commands are plausible', commandScore, 20, `${commandScore}/20 command points`],
-              ['Conceptual responses complete', conceptsComplete ? 10 : 0, 10, conceptsComplete ? 'complete' : 'finish identity fields, questions, and reflection']
+              ['Correct checkpoint branch identity', correctBranch ? 5 : 0, 5,
+                correctBranch ? (pr ? `${branch} via PR #${pr.number}` : branch) : `expected ${branch}`],
+              ['Commit evidence on CP4 branch', commitCount >= 1 ? 5 : 0, 5,
+                commitCount >= 1 ? `${commitCount} commit(s)` : 'commit the CP4 work'],
+              ['Pull Request targets main', pr ? 5 : 0, 5,
+                pr ? `PR #${pr.number}` : 'open the required Pull Request'],
+              ['PR changes only submission.md', allowedFiles ? 5 : 0, 5,
+                allowedFiles ? 'submission.md only' : (pr ? `changed: ${changedNames.join(', ') || 'none'}` : 'waiting for PR')],
+              ['Required Git commands are plausible', commandScore, 15,
+                `${commandScore}/15 command points`],
+              ['Local/remote responses complete', conceptsComplete ? 10 : 0, 10,
+                conceptsComplete ? 'identity and concept responses complete' : 'complete identity, Questions 1–4, and Reflection'],
+              ['APPROVED review before merge', approvedBeforeMerge ? 10 : 0, 10,
+                approvedBeforeMerge ? `approved by @${approvedBeforeMerge.user.login}` : 'get an APPROVED review from another user before merge'],
+              ['Pull Request merged after approval', mergedAfterApproval ? 5 : 0, 5,
+                mergedAfterApproval ? `merged at ${pr.merged_at}` : 'merge only after approval']
             ];
 
-            const automatic = checks.reduce((s, c) => s + c[1], 0);
+            const automatic = checks.reduce((sum, [, earned]) => sum + earned, 0);
             const rows = checks.map(([label, earned, max, detail]) =>
               `| ${earned === max ? '✅' : earned ? '🟨' : '⬜'} ${label} | ${earned}/${max} | ${detail} |`
             ).join('\n');
 
             const status = automatic < 60
               ? '🟡 **IN PROGRESS — complete the missing automatic evidence.**'
-              : '🔵 **AUTOMATIC CHECKS PASSED — ready for teacher review.**';
+              : '🔵 **AUTOMATIC CHECKS PASSED — reviewed, merged, and ready for teacher review.**';
 
             const defaultTeacherBlock = `<!-- klis-cp4-teacher-sync-start -->
             ### 🧑‍🏫 Teacher review
@@ -177,7 +216,7 @@ jobs:
 
             ${status}
 
-            **If a row is incomplete, fix \`submission.md\` or the Git/PR evidence on the feature branch and push again. This same table updates automatically.**
+            > The grader reads the PR head commit, so deleting the feature branch after merge is allowed.
 
             ## Submit for teacher review
 
